@@ -12,9 +12,9 @@ tasks:
     init: gp sync-await bundle
     command: pip install -r requirements.txt
   - name: Crear imagenes Docker
-      init: >
-        docker build . -f Inbound.Dockerfile
-        gp sync-done images
+    init: >
+      docker build . -f Inbound.Dockerfile
+      gp sync-done images
   - name: Crear folder para datos y asigna permisos
     init: >
       mkdir -p data/bookkeeper &&
