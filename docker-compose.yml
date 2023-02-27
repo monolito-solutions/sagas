@@ -98,3 +98,16 @@ services:
       - ./connectors/pulsar:/pulsar/connectors
     command: bash -c "bin/apply-config-from-env.py conf/broker.conf
       &&  exec bin/pulsar broker"
+
+  inbound:
+    container_name: inbound
+    hostname: inbound
+    image: EDA/inbound
+    profiles: ["EDA", "inbound"]
+    depends_on:
+      - broker
+    environment:
+      - EDA_ADDRESS=EDA
+      - PULSAR_ADDRESS=broker
+    networks:
+      - pulsar
