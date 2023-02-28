@@ -1,3 +1,4 @@
+aiopulsar-py
 fastapi
 uvicorn
 pulsar-client

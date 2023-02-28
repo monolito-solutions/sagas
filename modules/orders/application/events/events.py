@@ -1,10 +1,7 @@
-
-from pulsar.schema import String, Record, Float, Long, Field, Array
+from dataclasses import asdict
+from pulsar.schema import *
+from utils import time_millis
 import uuid
-import time
-
-def time_millis():
-    return int(time.time() * 1000)
 
 class ProductPayload(Record):
     product_id = String()
@@ -17,20 +14,27 @@ class ProductPayload(Record):
     def dict(self):
         return str({k: str(v) for k, v in asdict(self).items()})
 
-class OrderCreatedPayload(Record):
+
+class OrderCreated(Record):
+    id = String()
     order_id = String()
     customer_id = String()
     order_date = String()
     order_status = String()
-    order_items = String()
+    order_items = List()
     order_total = Float()
     order_version = Long()
 
-class OrderCreatedEvent(Record):
+
+class EventOrderCreated(Record):
     id = String(default=str(uuid.uuid4()))
+    time = Long()
     ingestion = Long(default=time_millis())
-    specversion = Long(default=2)
-    data = OrderCreatedPayload()
+    specversion = String(default="v1")
+    type = String(default="EventOrderCreated")
+    datacontenttype = String()
+    service_name = String(default="orders.entregasalpes")
+    order_created = OrderCreated
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
