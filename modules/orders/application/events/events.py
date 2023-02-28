@@ -16,12 +16,12 @@ class ProductPayload(Record):
 
 
 class OrderCreated(Record):
-    id = String()
+    id = String(default=str(uuid.uuid4()))
     order_id = String()
     customer_id = String()
     order_date = String()
     order_status = String()
-    order_items = List()
+    order_items = String()
     order_total = Float()
     order_version = Long()
 
@@ -30,7 +30,7 @@ class EventOrderCreated(Record):
     id = String(default=str(uuid.uuid4()))
     time = Long()
     ingestion = Long(default=time_millis())
-    specversion = String(default="v1")
+    specversion = String(default="v2")
     type = String(default="EventOrderCreated")
     datacontenttype = String()
     service_name = String(default="orders.entregasalpes")

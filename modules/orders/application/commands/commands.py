@@ -8,7 +8,7 @@ class CreateOrderPayload(Record):
     customer_id = String()
     order_date = String()
     order_status = String()
-    order_items = List()
+    order_items = String()
     order_total = Float()
     order_version = Long()
 

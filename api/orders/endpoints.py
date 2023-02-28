@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from upscaler.orders.versioning import detect_order_version
-from modules.orders.application.events.events import EventOrderCreated, OrderCreated
+from modules.orders.application.events.events import EventOrderCreated, OrderCreated, ProductPayload
 from infrastructure.dispatchers import Dispatcher
 import utils
 
@@ -13,7 +13,15 @@ def create_order(order:dict):
 
     ##TODO: Create order in database
 
-    payload = OrderCreated(**order)
+    payload = OrderCreated(
+        order_id = str(order.order_id),
+        customer_id = str(order.customer_id),
+        order_date = str(order.order_date),
+        order_status = str(order.order_status),
+        order_items = str([str(ProductPayload(**item))for item in order.order_items]),
+        order_total = float(order.order_total),
+        order_version = int(order.order_version)
+    )
 
     event = EventOrderCreated(
         time = utils.time_millis(),

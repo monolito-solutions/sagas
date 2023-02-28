@@ -5,7 +5,7 @@ import _pulsar
 import aiopulsar
 import asyncio
 from pulsar.schema import *
-from .utils import broker_host
+from utils import broker_host
 
 
 async def subscribe_to_topic(topic: str, suscripcion: str, schema: Record, tipo_consumidor: _pulsar.ConsumerType = _pulsar.ConsumerType.Shared):

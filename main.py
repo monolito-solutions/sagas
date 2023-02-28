@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
 import asyncio
-from infrastructure.dispatchers import subscribe_to_topic
+from infrastructure.consumers import subscribe_to_topic
 from modules.orders.application.events.events import EventOrderCreated
 from modules.orders.application.commands.commands import CommandCreateOrder
 from api.orders.endpoints import router as api_router
