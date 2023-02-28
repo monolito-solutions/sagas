@@ -19,9 +19,9 @@ async def subscribe_to_topic(topic: str, suscripcion: str, schema: Record, tipo_
             ) as consumidor:
                 while True:
                     mensaje = await consumidor.receive()
-                    print(mensaje)
                     datos = mensaje.value()
-                    print(f'Event recibido: {datos}')
+                    print(f'\nEvent recibido: {datos}')
+                    print(f"\nEvent data: {datos.order_created}")
                     await consumidor.acknowledge(mensaje)
 
     except:
