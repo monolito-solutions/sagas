@@ -9,3 +9,6 @@ class Product:
     description: str
     price: float
     quantity: int
+
+    def dict(self):
+        return str({k: str(v) for k, v in asdict(self).items()})

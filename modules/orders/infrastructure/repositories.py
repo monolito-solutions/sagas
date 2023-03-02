@@ -10,10 +10,10 @@ class OrdersRepositorySQLAlchemy:
 
     def get_by_id(self, id: UUID) -> OrderV2:
         order_dto = self.db.session.query(OrderDTO).filter_by(id=str(id)).one()
-        return OrderV2(**order_dto.__dict__)
+        return OrderV2(**order_dto.to_dict())
 
     def create(self, OrderV2: OrderV2):
-        order_dto = OrderDTO(**OrderV2.__dict__)
+        order_dto = OrderDTO(**OrderV2.to_dict())
         self.db.add(order_dto)
         self.db.commit()
         self.db.refresh(order_dto)

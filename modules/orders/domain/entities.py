@@ -36,3 +36,14 @@ class OrderV2:
     order_items: List[Product]
     order_total: float
     order_version: int = 2
+
+    def to_dict(self):
+        return {
+            "order_id": self.order_id,
+            "customer_id": self.customer_id,
+            "order_date": self.order_date,
+            "order_status": self.order_status,
+            "order_items": str([str(Product(**item))for item in self.order_items]),
+            "order_total": self.order_total,
+            "order_version": self.order_version
+        }
