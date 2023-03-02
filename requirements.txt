@@ -7,4 +7,3 @@ pulsar-client
 pulsar-client[avro]
 sqlalchemy
 pymysql
-alembic
