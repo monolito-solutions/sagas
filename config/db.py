@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from modules.orders.infrastructure.dtos import OrderDTO
 
 DB_USERNAME = "root"
 DB_PASSWORD = "adminadmin"
@@ -21,3 +22,9 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def get_base_metadata():
+    return Base.metadata
+
+def initialize_base():
+    return Base
