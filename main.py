@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
 import asyncio
+from pymysql.err import OperationalError
 from infrastructure.consumers import subscribe_to_topic
 from modules.orders.application.events.events import EventOrderCreated
 from modules.orders.application.commands.commands import CommandCreateOrder
@@ -16,8 +17,10 @@ app.add_exception_handler(BaseAPIException, api_exeption_handler)
 
 tasks = list()
 initialize_base()
-
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+except OperationalError:
+    Base.metadata.create_all(bind=engine)
 
 @app.on_event("startup")
 async def app_startup():
