@@ -43,7 +43,7 @@ class OrderV2:
             "customer_id": self.customer_id,
             "order_date": self.order_date,
             "order_status": self.order_status,
-            "order_items": str([str(Product(**item))for item in self.order_items]),
+            "order_items": str([str(Product(**item).to_dict())for item in self.order_items]),
             "order_total": self.order_total,
             "order_version": self.order_version
         }

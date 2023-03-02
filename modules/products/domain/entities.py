@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 import uuid
 
 @dataclass(frozen=True)
@@ -10,5 +10,5 @@ class Product:
     price: float
     quantity: int
 
-    def dict(self):
+    def to_dict(self):
         return str({k: str(v) for k, v in asdict(self).items()})
