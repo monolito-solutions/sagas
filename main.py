@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 import uvicorn
 import asyncio
-from pymysql.err import OperationalError
+from sqlalchemy.exc import OperationalError
 from infrastructure.consumers import subscribe_to_topic
 from modules.orders.application.events.events import EventOrderCreated
 from modules.orders.application.commands.commands import CommandCreateOrder
