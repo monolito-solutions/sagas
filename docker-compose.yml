@@ -102,8 +102,8 @@ services:
   inbound:
     container_name: inbound
     hostname: inbound
-    image: EDA/inbound
-    profiles: ["EDA", "inbound"]
+    image: eda/inbound
+    profiles: ["inbound"]
     depends_on:
       - broker
     environment:
@@ -122,7 +122,7 @@ services:
     environment:
       - MYSQL_DATABASE=orders
       - MYSQL_ROOT_PASSWORD=adminadmin
-    profiles: ["inbound", "db"]
+    profiles: ["db"]
     networks:
       - pulsar
     ports:
