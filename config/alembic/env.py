@@ -1,5 +1,5 @@
 from logging.config import fileConfig
-from .settings import get_base_metadata
+from config.alembic.settings import get_base_metadata
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
