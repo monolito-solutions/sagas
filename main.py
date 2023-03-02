@@ -7,6 +7,8 @@ from modules.orders.application.commands.commands import CommandCreateOrder
 from api.orders.endpoints import router as api_router
 from api.errors.exceptions import BaseAPIException
 from api.errors.handlers import api_exeption_handler
+from config.db import Base, engine
+from config.alembic.settings import initialize_base
 
 app = FastAPI()
 app.include_router(api_router)
@@ -14,7 +16,9 @@ app.add_exception_handler(BaseAPIException, api_exeption_handler)
 
 
 tasks = list()
+initialize_base()
 
+Base.metadata.create_all(bind=engine)
 
 @app.on_event("startup")
 async def app_startup():
