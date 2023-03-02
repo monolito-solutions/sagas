@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends
 from upscaler.orders.versioning import detect_order_version
+from sqlalchemy.exc import IntegrityError
+from api.errors.exceptions import BaseAPIException
 from modules.orders.application.events.events import EventOrderCreated, OrderCreated, ProductPayload
 from modules.orders.infrastructure.repositories import OrdersRepositorySQLAlchemy
 from infrastructure.dispatchers import Dispatcher
@@ -13,9 +15,13 @@ router = APIRouter(prefix="/orders", tags=["orders"])
 def create_order(order:dict, db=Depends(get_db)):
     order = detect_order_version(order)
 
-    ##TODO: Create order in database
-    repository = OrdersRepositorySQLAlchemy(db)
-    repository.create(order)
+    try:
+        repository = OrdersRepositorySQLAlchemy(db)
+        repository.create(order)
+    except IntegrityError:
+        raise BaseAPIException(f"Error creating order, primary key integrity violated (Duplicate ID)", 400)
+    except Exception as e:
+        raise BaseAPIException(f"Error creating order: {e}", 500)
 
     payload = OrderCreated(
         order_id = str(order.order_id),
