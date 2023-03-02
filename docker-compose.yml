@@ -111,3 +111,21 @@ services:
       - PULSAR_ADDRESS=broker
     networks:
       - pulsar
+  db:
+  image: mysql:8
+  hostname: mysqldb
+  container_name: mysqldb
+  cap_add:
+    - SYS_NICE
+  restart: always
+  environment:
+    - MYSQL_DATABASE=orders
+    - MYSQL_ROOT_PASSWORD=adminadmin
+  profiles: ["inbound", "db"]
+  networks:
+    - pulsar
+  ports:
+    - '3306:3306'
+  volumes:
+    - ./data/mysql:/var/lib/mysql
+    - ./init.sql:/docker-entrypoint-initdb.d/init.sql

@@ -1,17 +1,21 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from upscaler.orders.versioning import detect_order_version
 from modules.orders.application.events.events import EventOrderCreated, OrderCreated, ProductPayload
+from modules.orders.infrastructure.repositories import OrdersRepositorySQLAlchemy
 from infrastructure.dispatchers import Dispatcher
+from config.db import get_db
 import utils
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 
 @router.post("/", status_code=202)
-def create_order(order:dict):
+def create_order(order:dict, db=Depends(get_db)):
     order = detect_order_version(order)
 
     ##TODO: Create order in database
+    repository = OrdersRepositorySQLAlchemy(db)
+    repository.create(order)
 
     payload = OrderCreated(
         order_id = str(order.order_id),
