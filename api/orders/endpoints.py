@@ -38,7 +38,7 @@ def create_order(order:dict, db=Depends(get_db)):
         time = utils.time_millis(),
         ingestion = utils.time_millis(),
         datacontenttype = OrderCreatedPayload.__name__,
-        order_created = event_payload
+        data_payload = event_payload
     )
 
     command_payload = CheckInventoryPayload(**event_payload.to_dict())
@@ -48,7 +48,7 @@ def create_order(order:dict, db=Depends(get_db)):
         time = utils.time_millis(),
         ingestion = utils.time_millis(),
         datacontenttype = CheckInventoryPayload.__name__,
-        data = command_payload
+        data_payload = command_payload
     )
 
     dispatcher = Dispatcher()

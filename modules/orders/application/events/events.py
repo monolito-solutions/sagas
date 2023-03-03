@@ -27,13 +27,13 @@ class OrderCreatedPayload(Record):
 
     def to_dict(self):
         return {
-            "order_id": self.order_id,
-            "customer_id":self.customer_id,
-            "order_date": self.order_date,
-            "order_status": self.order_status,
-            "order_items": self.order_items,
-            "order_total": self.order_total,
-            "order_version": self.order_version
+            "order_id": str(self.order_id),
+            "customer_id": str(self.customer_id),
+            "order_date": str(self.order_date),
+            "order_status": str(self.order_status),
+            "order_items": str(self.order_items),
+            "order_total": float(self.order_total),
+            "order_version": int(self.order_version)
         }
 
 
