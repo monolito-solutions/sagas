@@ -111,6 +111,8 @@ services:
       - PULSAR_ADDRESS=broker
     networks:
       - pulsar
+    ports:
+      - '6969:6969'
 
   db:
     image: mysql:8
