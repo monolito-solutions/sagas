@@ -25,6 +25,17 @@ class OrderCreatedPayload(Record):
     order_total = Float()
     order_version = Long()
 
+    def to_dict(self):
+        return {
+            "order_id": self.order_id,
+            "customer_id":self.customer_id,
+            "order_date": self.order_date,
+            "order_status": self.order_status,
+            "order_items": self.order_items,
+            "order_total": self.order_total,
+            "order_version": self.order_version
+        }
+
 
 class EventOrderCreated(Record):
     id = String(default=str(uuid.uuid4()))
@@ -34,7 +45,7 @@ class EventOrderCreated(Record):
     type = String(default="EventOrderCreated")
     datacontenttype = String()
     service_name = String(default="orders.entregasalpes")
-    order_created = OrderCreatedPayload
+    data_payload = OrderCreatedPayload
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

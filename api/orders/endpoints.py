@@ -41,7 +41,8 @@ def create_order(order:dict, db=Depends(get_db)):
         order_created = event_payload
     )
 
-    command_payload = CheckInventoryPayload(**event_payload.dict())
+    command_payload = CheckInventoryPayload(**event_payload.to_dict())
+    command_payload.order_status = "Ready to check inventory"
 
     command = CommandCheckInventoryOrder(
         time = utils.time_millis(),

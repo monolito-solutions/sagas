@@ -21,7 +21,7 @@ class CommandCheckInventoryOrder(Record):
     type = String(default="CommandCheckInventory")
     datacontenttype = String()
     service_name = String(default="orders.entregasalpes")
-    data = CheckInventoryPayload
+    data_payload = CheckInventoryPayload
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

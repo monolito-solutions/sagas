@@ -21,7 +21,7 @@ async def subscribe_to_topic(topic: str, subscription: str, schema: Record, cons
                     mensaje = await consumer.receive()
                     datos = mensaje.value()
                     print(f'\nEvent recibido: {datos}')
-                    print(f"\nEvent data: {datos.order_created}")
+                    print(f"\nEvent data: {datos.data_payload}")
                     await consumer.acknowledge(mensaje)
 
     except:
