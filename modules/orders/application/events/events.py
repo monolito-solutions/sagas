@@ -15,7 +15,7 @@ class ProductPayload(Record):
         return str({k: str(v) for k, v in asdict(self).items()})
 
 
-class OrderCreated(Record):
+class OrderCreatedPayload(Record):
     id = String(default=str(uuid.uuid4()))
     order_id = String()
     customer_id = String()
@@ -34,7 +34,7 @@ class EventOrderCreated(Record):
     type = String(default="EventOrderCreated")
     datacontenttype = String()
     service_name = String(default="orders.entregasalpes")
-    order_created = OrderCreated
+    order_created = OrderCreatedPayload
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

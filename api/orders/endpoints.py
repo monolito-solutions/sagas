@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends
 from upscaler.orders.versioning import detect_order_version
 from sqlalchemy.exc import IntegrityError
 from api.errors.exceptions import BaseAPIException
-from modules.orders.application.events.events import EventOrderCreated, OrderCreated, ProductPayload
+from modules.orders.application.events.events import EventOrderCreated, OrderCreatedPayload, ProductPayload
+from modules.orders.application.commands.commands import CommandCheckInventoryOrder, CheckInventoryPayload
 from modules.orders.infrastructure.repositories import OrdersRepositorySQLAlchemy
 from infrastructure.dispatchers import Dispatcher
 from config.db import get_db
@@ -23,7 +24,7 @@ def create_order(order:dict, db=Depends(get_db)):
     except Exception as e:
         raise BaseAPIException(f"Error creating order: {e}", 500)
 
-    payload = OrderCreated(
+    event_payload = OrderCreatedPayload(
         order_id = str(order.order_id),
         customer_id = str(order.customer_id),
         order_date = str(order.order_date),
@@ -36,10 +37,22 @@ def create_order(order:dict, db=Depends(get_db)):
     event = EventOrderCreated(
         time = utils.time_millis(),
         ingestion = utils.time_millis(),
-        datacontenttype = OrderCreated.__name__,
-        order_created = payload
+        datacontenttype = OrderCreatedPayload.__name__,
+        order_created = event_payload
+    )
+
+    command_payload = CheckInventoryPayload(**event_payload.dict())
+
+    command = CommandCheckInventoryOrder(
+        time = utils.time_millis(),
+        ingestion = utils.time_millis(),
+        datacontenttype = CheckInventoryPayload.__name__,
+        data = command_payload
     )
 
     dispatcher = Dispatcher()
     dispatcher.publish_message(event, "order-event")
+    dispatcher.publish_message(command, "order-commands")
+
+
     return {"message": "Order created successfully"}

@@ -4,7 +4,7 @@ import asyncio
 from sqlalchemy.exc import OperationalError
 from infrastructure.consumers import subscribe_to_topic
 from modules.orders.application.events.events import EventOrderCreated
-from modules.orders.application.commands.commands import CommandCreateOrder
+from modules.orders.application.commands.commands import CommandCheckInventoryOrder
 from api.orders.endpoints import router as api_router
 from api.errors.exceptions import BaseAPIException
 from api.errors.handlers import api_exeption_handler
@@ -26,9 +26,9 @@ except OperationalError:
 async def app_startup():
     global tasks
     task1 = asyncio.ensure_future(subscribe_to_topic(
-        "order-event", "sub-orders", EventOrderCreated))
+        "order-events", "sub-orders", EventOrderCreated))
     task2 = asyncio.ensure_future(subscribe_to_topic(
-        "command-create-order", "sub-com-order-create", CommandCreateOrder))
+        "order-commands", "sub-com-order-create", CommandCheckInventoryOrder))
     tasks.append(task1)
     tasks.append(task2)
 
