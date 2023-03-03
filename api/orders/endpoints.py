@@ -52,7 +52,7 @@ def create_order(order:dict, db=Depends(get_db)):
     )
 
     dispatcher = Dispatcher()
-    dispatcher.publish_message(event, "order-event")
+    dispatcher.publish_message(event, "order-events")
     dispatcher.publish_message(command, "order-commands")
 
 

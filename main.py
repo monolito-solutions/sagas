@@ -28,7 +28,7 @@ async def app_startup():
     task1 = asyncio.ensure_future(subscribe_to_topic(
         "order-events", "sub-orders", EventOrderCreated))
     task2 = asyncio.ensure_future(subscribe_to_topic(
-        "order-commands", "sub-com-order-create", CommandCheckInventoryOrder))
+        "order-commands", "sub-com-order-checkinventory", CommandCheckInventoryOrder))
     tasks.append(task1)
     tasks.append(task2)
 
