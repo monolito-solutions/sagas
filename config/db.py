@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 
 DB_USERNAME = "root"
 DB_PASSWORD = "adminadmin"
-DB_HOSTNAME = "0.0.0.0"
+DB_HOSTNAME = "localhost"
 
 SQLALCHEMY_DATABASE_URL = f'mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOSTNAME}/orders'
 
