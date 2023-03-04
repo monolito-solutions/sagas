@@ -1,7 +1,7 @@
 version: '3'
 networks:
   pulsar:
-    driver: host
+    driver: bridge
 
 services:
 # Start zookeeper
