@@ -19,6 +19,14 @@ class OrdersRepositorySQLAlchemy:
         self.db.refresh(order_dto)
         return order_dto
 
+    def update(self, OrderV2: OrderV2):
+        order_dto = self.db.session.query(OrderDTO).filter_by(id=str(OrderV2.id)).one()
+        order_dto = OrderDTO(**OrderV2.to_dict())
+        self.db.commit()
+        return order_dto
+
     def delete(self, id: UUID):
-        # TODO
-        raise NotImplementedError
+        order_dto = self.db.session.query(OrderDTO).filter_by(id=str(id)).one()
+        order_dto.delete()
+        self.db.commit()
+        return order_dto
