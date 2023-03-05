@@ -24,14 +24,3 @@ def millis_a_datetime(millis):
 
 def broker_host():
     return os.getenv(PULSAR_ENV, default="172.17.0.1")
-
-
-def consultar_schema_registry(topic: str) -> dict:
-    json_registry = requests.get(
-        f'http://{broker_host()}:8080/admin/v2/schemas/{topic}/schema').json()
-    return json.loads(json_registry.get('data', {}))
-
-
-def obtener_schema_avro_de_diccionario(json_schema: dict) -> AvroSchema:
-    definicion_schema = parse_schema(json_schema)
-    return AvroSchema(None, schema_definition=definicion_schema)
