@@ -8,6 +8,7 @@ from modules.orders.infrastructure.repositories import OrdersRepositorySQLAlchem
 from infrastructure.dispatchers import Dispatcher
 from config.db import get_db
 import utils
+import json
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
@@ -29,7 +30,7 @@ def create_order(order:dict, db=Depends(get_db)):
         customer_id = str(order.customer_id),
         order_date = str(order.order_date),
         order_status = str(order.order_status),
-        order_items = str([str(ProductPayload(**item))for item in order.order_items]),
+        order_items = json.dumps(order.order_items),
         order_total = float(order.order_total),
         order_version = int(order.order_version)
     )
