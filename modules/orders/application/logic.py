@@ -9,7 +9,6 @@ from config.db import get_db
 import utils
 import json
 
-
 def create_order(order:dict):
     db = get_db()
     order = detect_order_version(order)
@@ -28,7 +27,7 @@ def create_order(order:dict):
         customer_id = str(order.customer_id),
         order_date = str(order.order_date),
         order_status = str(order.order_status),
-        order_items = json.dumps(order.order_items),
+        order_items = json.dumps(order.order_items) if type(order.order_items != str) else order.order_items,
         order_total = float(order.order_total),
         order_version = int(order.order_version)
     )

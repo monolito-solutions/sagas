@@ -17,10 +17,7 @@ Base = declarative_base()
 
 def get_db():
     db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+    return db
 
 def get_base_metadata():
     return Base.metadata
