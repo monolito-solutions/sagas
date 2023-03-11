@@ -1,7 +1,7 @@
 from upscaler.orders.versioning import detect_order_version
 from sqlalchemy.exc import IntegrityError
 from api.errors.exceptions import BaseAPIException
-from modules.orders.application.events.events import EventOrderCreated, OrderCreatedPayload
+from modules.orders.application.events.events import OrderEvent, OrderCreatedPayload
 from modules.orders.application.commands.commands import CommandCheckInventoryOrder, CheckInventoryPayload
 from modules.orders.infrastructure.repositories import OrdersRepositorySQLAlchemy
 from infrastructure.dispatchers import Dispatcher
@@ -32,7 +32,7 @@ def create_order(order:dict):
         order_version = int(order.order_version)
     )
 
-    event = EventOrderCreated(
+    event = OrderEvent(
         time = utils.time_millis(),
         ingestion = utils.time_millis(),
         datacontenttype = OrderCreatedPayload.__name__,

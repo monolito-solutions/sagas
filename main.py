@@ -7,7 +7,7 @@ import json
 import utils
 from sqlalchemy.exc import OperationalError
 from infrastructure.consumers import subscribe_to_topic
-from modules.orders.application.events.events import EventOrderCreated, OrderCreatedPayload
+from modules.orders.application.events.events import OrderEvent, OrderCreatedPayload
 from modules.orders.application.commands.commands import CommandCheckInventoryOrder
 from config.db import Base, engine, initialize_base
 from modules.orders.application.logic import create_order
@@ -26,11 +26,8 @@ except OperationalError:
 async def app_startup():
     global tasks
     task1 = asyncio.ensure_future(subscribe_to_topic(
-        "order-events", "sub-inbound", EventOrderCreated))
-    task2 = asyncio.ensure_future(subscribe_to_topic(
-        "order-commands", "sub-com-inbound", CommandCheckInventoryOrder))
+        "order-events", "sub-inbound", OrderEvent))
     tasks.append(task1)
-    tasks.append(task2)
 
 
 @app.on_event("shutdown")
@@ -51,7 +48,7 @@ def create_order_endpoint():
         order_version = int(random.randint(1,10))
     )
 
-    event = EventOrderCreated(
+    event = OrderEvent(
         time = utils.time_millis(),
         ingestion = utils.time_millis(),
         datacontenttype = OrderCreatedPayload.__name__,
@@ -65,4 +62,4 @@ def create_order_endpoint():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=6969)
+    uvicorn.run(app, host="localhost", port=1250)

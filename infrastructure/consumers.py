@@ -21,7 +21,6 @@ async def subscribe_to_topic(topic: str, subscription: str, schema: Record, cons
                     mensaje = await consumer.receive()
                     datos = mensaje.value()
                     print(f'\nEvent recibido: {datos.type}')
-                    print(f"\nEvent data: {datos.data_payload}")
                     if datos.type == "CommandCreateOrder":
                         create_order(datos.data_payload)
                     await consumer.acknowledge(mensaje)
