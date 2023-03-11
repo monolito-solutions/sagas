@@ -17,6 +17,7 @@ class TransactionLogRepositorySQLAlchemy:
 
     def create(self, event: SagasEvent):
         log_dto = TransactionLogDTO(**event.to_dict())
+        self.db.add(log_dto)
         self.db.commit()
         self.db.refresh(log_dto)
         return log_dto
