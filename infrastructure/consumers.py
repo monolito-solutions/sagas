@@ -6,6 +6,9 @@ import aiopulsar
 import asyncio
 from pulsar.schema import *
 from utils import broker_host
+from modules.sagas.application.choreography import ChoreographySagaManager
+
+manager = ChoreographySagaManager()
 
 async def subscribe_to_topic(topic: str, subscription: str, schema: Record, consumer_type: _pulsar.ConsumerType = _pulsar.ConsumerType.Shared):
     try:
@@ -21,8 +24,9 @@ async def subscribe_to_topic(topic: str, subscription: str, schema: Record, cons
                     datos = mensaje.value()
                     print(f'\nEvent recibido: {datos.type}')
                     if datos.type == "CommandCreateOrder":
-                        ## TODO: Sagas
-                        pass
+                        manager.start_transaction(datos.data_payload, datos.type)
+                    else:
+                        manager.handle_event(datos.data_payload, datos.type)
                     await consumer.acknowledge(mensaje)
 
     except:

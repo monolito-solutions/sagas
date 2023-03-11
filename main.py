@@ -7,8 +7,8 @@ import json
 import utils
 from sqlalchemy.exc import OperationalError
 from infrastructure.consumers import subscribe_to_topic
-from modules.orders.application.events.events import OrderEvent, EventPayload
-from modules.orders.application.commands.commands import OrderCommand
+from modules.orders.application.events.events import OrderEvent
+from modules.orders.application.commands.commands import OrderCommand, CommandPayload
 from config.db import Base, engine, initialize_base
 from infrastructure.dispatchers import Dispatcher
 from modules.sagas.application.saga import SagasEvent
@@ -43,7 +43,7 @@ def shutdown_event():
 
 @app.get("/orders")
 def create_order_endpoint():
-    event_payload = EventPayload(
+    event_payload = CommandPayload(
         order_id = str(uuid.uuid4()),
         customer_id = str(uuid.uuid4()),
         order_date = str("2023-02-27T08:05:08.464634"),
@@ -53,16 +53,34 @@ def create_order_endpoint():
         order_version = int(random.randint(1,10))
     )
 
-    event = OrderEvent(
+    event1 = OrderCommand(
         time = utils.time_millis(),
         ingestion = utils.time_millis(),
-        datacontenttype = OrderCreatedPayload.__name__,
+        datacontenttype = CommandPayload.__name__,
         data_payload = event_payload,
         type = "CommandCreateOrder"
     )
+    event2 = OrderCommand(
+        time = utils.time_millis(),
+        ingestion = utils.time_millis(),
+        datacontenttype = CommandPayload.__name__,
+        data_payload = event_payload,
+        type = "CommandCheckInventory"
+    )
 
+    event3 = OrderCommand(
+        time = utils.time_millis(),
+        ingestion = utils.time_millis(),
+        datacontenttype = CommandPayload.__name__,
+        data_payload = event_payload,
+        type = "CommandDispatchOrder"
+    )
+    print(event1)
+    print(event2)
     dispatcher = Dispatcher()
-    dispatcher.publish_message(event, "order-commands")
+    dispatcher.publish_message(event1, "order-commands")
+    dispatcher.publish_message(event2, "order-commands")
+    dispatcher.publish_message(event3, "order-commands")
     return {"message": "Order created successfully"}
 
 @app.get("/test")
