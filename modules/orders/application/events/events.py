@@ -25,6 +25,11 @@ class EventPayload(Record):
     order_total = Float()
     order_version = Long()
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.id is None:
+            self.id = str(uuid.uuid4())
+
     def to_dict(self):
         return {
             "order_id": str(self.order_id),
@@ -38,7 +43,7 @@ class EventPayload(Record):
 
 
 class OrderEvent(Record):
-    id = String(default=str(uuid.uuid4()))
+    id = String(default=None)
     time = Long()
     ingestion = Long(default=time_millis())
     specversion = String(default="v2")
@@ -49,3 +54,5 @@ class OrderEvent(Record):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if self.id is None:
+            self.id = str(uuid.uuid4())

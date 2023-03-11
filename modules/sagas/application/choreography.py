@@ -3,8 +3,11 @@ import time
 from dataclasses import dataclass, field
 from typing import List
 import uuid
+from infrastructure.dispatchers import Dispatcher
+from modules.orders.application.commands.commands import CommandPayload, OrderCommand
 from modules.sagas.infrastructure.repositories import TransactionLogRepositorySQLAlchemy
 from config.db import get_base_metadata, get_db
+import utils
 
 @dataclass
 class SagasEvent:
@@ -37,8 +40,7 @@ def get_transaction_steps():
         Step(index=1, event="EventInventoryChecked",
                 error="ErrorCheckingInventory", compensation="CancelOrder"),
         Step(index=2, event="EventOrderDispatched",
-                error="ErrorDispatchingOrder", compensation="RevertInventory"),
-        Step(index=3, last_event=True)
+                error="ErrorDispatchingOrder", compensation="RevertInventory", last_event=True)
     ]
 
 @dataclass
@@ -69,64 +71,63 @@ class ChoreographySagaManager:
     def __init__(self):
         self.transactions: Dict[str, OrderManagementTransaction] = {}
 
-    def start_transaction(self, message_data, event_type):
-        first_event = SagasEvent(message_data.order_id, event_type, message_data.order_id, message_data.order_status)
+    def start_transaction(self, message_data, event_type, event_id):
+        first_event = SagasEvent(event_id, event_type, message_data.order_id, message_data.order_status)
         transaction = OrderManagementTransaction(first_event.order_id, first_event, [])
         self.transactions[message_data.order_id] = transaction
         transaction.event_to_log(first_event)
-        self._execute_step(transaction, first_event, message_data)
 
-    def handle_event(self, message_data, event_type):
-        event = SagasEvent(message_data.order_id, event_type, message_data.order_id, message_data.order_status)
+    def handle_event(self, message_data, event_type, event_id):
+        event = SagasEvent(event_id, event_type, message_data.order_id, message_data.order_status)
         order_id = event.order_id
         transaction = self.transactions.get(order_id)
-        print(transaction)
         if transaction is None:
             return
 
         transaction.event_to_log(event)
-        self._execute_step(transaction, event, message)
+        self._execute_step(transaction, event, message_data)
 
     def handle_error(self, compensation, message):
-        command_payload = CommandPayload(
-        order_id = message.order_id,
-        customer_id = message.customer_id,
-        order_date = message.order_id,
-        order_status = message.order_status,
-        order_items = message.order_items,
-        order_total = float(message.order_total),
-        order_version = int(message.order_version)
-        )
+        if compensation is not None:
+            command_payload = CommandPayload(
+            order_id = message.order_id,
+            customer_id = message.customer_id,
+            order_date = message.order_id,
+            order_status = message.order_status,
+            order_items = message.order_items,
+            order_total = float(message.order_total),
+            order_version = int(message.order_version)
+            )
 
-        compensation_command = OrderCommand(
-            time = utils.time_millis(),
-            ingestion = utils.time_millis(),
-            datacontenttype = CommandPayload.__name__,
-            data_payload = command_payload,
-            type = compensation
-        )
-        dispatcher = Dispatcher()
-        dispatcher.publish_message(compensation_command, "order-commands")
+            compensation_command = OrderCommand(
+                time = utils.time_millis(),
+                ingestion = utils.time_millis(),
+                datacontenttype = CommandPayload.__name__,
+                data_payload = command_payload,
+                type = compensation
+            )
+            dispatcher = Dispatcher()
+            dispatcher.publish_message(compensation_command, "order-commands")
+        return
 
     def _execute_step(self, transaction: OrderManagementTransaction, event: SagasEvent, message):
         current_step = transaction.transaction_steps[0]
         for step in transaction.transaction_steps:
-            if step.event == event.event_type:
+            if step.event == event.event_type or step.error == event.event_type:
                 current_step = step
                 break
 
-        if current_step.step_completed:
-            return
-        elif current_step.last_event:
-            self.transactions.pop(transaction.order_id)
-            return
-        elif current_step.error == event.event_type:
+        if event.event_type in self.errors:
             # Compensating action for the failed event
             compensation_event_type = current_step.compensation
-            compensation_event = SagasEvent(str(uuid.uuid4()), compensation_event_type, transaction.order_id, transaction.current_event.order_status)
-            self.handle_error(compensation_event, event, message)
+            compensation_event = SagasEvent(str(uuid.uuid4()), compensation_event_type, event.order_id, event.order_status)
+            for index in range(current_step.index, -1, -1):
+                self.handle_error(transaction.transaction_steps[index].compensation, message)
             return
 
         current_step.step_completed = True
         if current_step.compensation is not None:
             transaction.current_event = event
+        if current_step.last_event:
+            self.transactions.pop(transaction.order_id)
+            return

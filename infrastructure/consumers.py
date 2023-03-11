@@ -23,10 +23,10 @@ async def subscribe_to_topic(topic: str, subscription: str, schema: Record, cons
                     mensaje = await consumer.receive()
                     datos = mensaje.value()
                     print(f'\nEvent recibido: {datos.type}')
-                    if datos.type == "CommandCreateOrder":
-                        manager.start_transaction(datos.data_payload, datos.type)
+                    if datos.type == "EventOrderCreated":
+                        manager.start_transaction(datos.data_payload, datos.type, datos.id)
                     else:
-                        manager.handle_event(datos.data_payload, datos.type)
+                        manager.handle_event(datos.data_payload, datos.type, datos.id)
                     await consumer.acknowledge(mensaje)
 
     except:
