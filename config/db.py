@@ -6,7 +6,7 @@ DB_USERNAME = "root"
 DB_PASSWORD = "adminadmin"
 DB_HOSTNAME = "172.17.0.1"
 
-SQLALCHEMY_DATABASE_URL = f'mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOSTNAME}/orders'
+SQLALCHEMY_DATABASE_URL = f'mysql+pymysql://{DB_USERNAME}:{DB_PASSWORD}@{DB_HOSTNAME}/logs'
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL
@@ -23,5 +23,5 @@ def get_base_metadata():
     return Base.metadata
 
 def initialize_base():
-    from modules.orders.infrastructure.dtos import OrderDTO
+    from modules.sagas.infrastructure.dtos import TransactionLogDTO
     return Base

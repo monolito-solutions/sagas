@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List
 
 @dataclass
@@ -23,12 +23,12 @@ class OrderManagementTransaction:
     order_id: str
     current_event: SagasEvent
     transaction_history: List[SagasEvent]
-    transaction_steps: List[Step] = [
+    transaction_steps: field(default_factory=lambda: [
         Step(index=0, command="CreateOrderCommand", event="EventOrderCreated", error="OrderCreateError", compensation=None),
         Step(index=1, command="CheckInventoryOrder", event="InventoryChecked", error="EventInventoryChecked", compensation="CancelOrder"),
         Step(index=2, command="CommandDispatchOrder", event="EventOrderDispatched", error="ErrorDispatchingOrder", compensation="RevertInventory"),
         Step(index=3, last_event=True)
-    ]
+    ])
 
     def check_step(self, message_data):
         ##TODO: 1. Si el comando es Create Order crear el transaction history y poner como evento actual

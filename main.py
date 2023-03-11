@@ -7,11 +7,12 @@ import json
 import utils
 from sqlalchemy.exc import OperationalError
 from infrastructure.consumers import subscribe_to_topic
-from modules.orders.application.events.events import OrderEvent, OrderCreatedPayload
-from modules.orders.application.commands.commands import CommandCheckInventoryOrder
+from modules.orders.application.events.events import OrderEvent, EventPayload
+from modules.orders.application.commands.commands import OrderCommand
 from config.db import Base, engine, initialize_base
-from modules.orders.application.logic import create_order
 from infrastructure.dispatchers import Dispatcher
+from modules.sagas.infrastructure.repositories import TransactionLogRepositorySQLAlchemy
+from config.db import get_db
 
 app = FastAPI()
 
@@ -38,7 +39,7 @@ def shutdown_event():
 
 @app.get("/orders")
 def create_order_endpoint():
-    event_payload = OrderCreatedPayload(
+    event_payload = EventPayload(
         order_id = str(uuid.uuid4()),
         customer_id = str(uuid.uuid4()),
         order_date = str("2023-02-27T08:05:08.464634"),
@@ -57,8 +58,26 @@ def create_order_endpoint():
     )
 
     dispatcher = Dispatcher()
-    dispatcher.publish_message(event, "order-events")
+    dispatcher.publish_message(event, "order-commands")
     return {"message": "Order created successfully"}
+
+@app.get("/test")
+def test_db_sagas():
+    db = get_db()
+    try:
+        repository = TransactionLogRepositorySQLAlchemy(db)
+        response = repository.create(SagasEvent(
+            event_id = uuid.uuid4(),
+            event_type="TestEvent",
+            order_id = uuid.uuid4(),
+            order_status = random.choice(["Created", "Checking Inventory", "Ready for Dispatch"])
+        ))
+        return {"event": response}
+    except Exception as e:
+        return {"error", e.__class__}
+    finally:
+        if db:
+            db.close
 
 
 if __name__ == "__main__":
