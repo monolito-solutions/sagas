@@ -11,6 +11,7 @@ from modules.orders.application.events.events import OrderEvent, EventPayload
 from modules.orders.application.commands.commands import OrderCommand
 from config.db import Base, engine, initialize_base
 from infrastructure.dispatchers import Dispatcher
+from modules.sagas.application.saga import SagasEvent
 from modules.sagas.infrastructure.repositories import TransactionLogRepositorySQLAlchemy
 from config.db import get_db
 
@@ -27,8 +28,11 @@ except OperationalError:
 async def app_startup():
     global tasks
     task1 = asyncio.ensure_future(subscribe_to_topic(
-        "order-events", "sub-inbound", OrderEvent))
+        "order-events", "sub-sagas", OrderEvent))
+    task2 = asyncio.ensure_future(subscribe_to_topic(
+        "order-commands", "com-sagas", OrderCommand))
     tasks.append(task1)
+    tasks.append(task2)
 
 
 @app.on_event("shutdown")
@@ -64,20 +68,25 @@ def create_order_endpoint():
 @app.get("/test")
 def test_db_sagas():
     db = get_db()
-    try:
-        repository = TransactionLogRepositorySQLAlchemy(db)
-        response = repository.create(SagasEvent(
-            event_id = uuid.uuid4(),
-            event_type="TestEvent",
-            order_id = uuid.uuid4(),
-            order_status = random.choice(["Created", "Checking Inventory", "Ready for Dispatch"])
-        ))
-        return {"event": response}
-    except Exception as e:
-        return {"error", e.__class__}
-    finally:
-        if db:
-            db.close
+    repository = TransactionLogRepositorySQLAlchemy(db)
+    event = SagasEvent(
+        event_id = uuid.uuid4(),
+        event_type="TestEvent",
+        order_id = uuid.uuid4(),
+        order_status = random.choice(["Created", "Checking Inventory", "Ready for Dispatch"])
+    )
+    response = repository.create(event)
+    print(response)
+    db.close()
+    return {"event": response}
+
+@app.get("/get_test")
+def test_get_db(order_id: uuid.UUID):
+    db = get_db()
+    repository = TransactionLogRepositorySQLAlchemy(db)
+    response = repository.get_order_log(order_id)
+    db.close()
+    return {"events": response}
 
 
 if __name__ == "__main__":
