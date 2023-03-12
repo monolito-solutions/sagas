@@ -6,23 +6,11 @@ import uuid
 from infrastructure.dispatchers import Dispatcher
 from modules.orders.application.commands.commands import CommandPayload, OrderCommand
 from modules.sagas.infrastructure.repositories import TransactionLogRepositorySQLAlchemy
+from modules.sagas.domain.entities import SagasEvent
 from config.db import get_base_metadata, get_db
 import utils
 
-@dataclass
-class SagasEvent:
-    event_id: str
-    event_type: str
-    order_id: str
-    order_status: str
 
-    def to_dict(self):
-        return {
-            "event_id": self.event_id,
-            "event_type": self.event_type,
-            "order_id": self.order_id,
-            "order_status": self.order_status
-        }
 
 @dataclass
 class Step:

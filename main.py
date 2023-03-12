@@ -9,11 +9,12 @@ from sqlalchemy.exc import OperationalError
 from infrastructure.consumers import subscribe_to_topic
 from modules.orders.application.events.events import OrderEvent, EventPayload
 from modules.orders.application.commands.commands import OrderCommand
+from modules.sagas.application.messages.payloads import QueryMessage
 from config.db import Base, engine, initialize_base
 from infrastructure.dispatchers import Dispatcher
-from modules.sagas.application.saga import SagasEvent
 from modules.sagas.infrastructure.repositories import TransactionLogRepositorySQLAlchemy
 from config.db import get_db
+from modules.sagas.application.choreography import SagasEvent
 
 app = FastAPI()
 
@@ -31,6 +32,8 @@ async def app_startup():
         "order-events", "sub-sagas", OrderEvent))
     task2 = asyncio.ensure_future(subscribe_to_topic(
         "order-commands", "com-sagas", OrderCommand))
+    task3 = asyncio.ensure_future(subscribe_to_topic(
+        "order-queries", "query-sagas", QueryMessage))
     tasks.append(task1)
     tasks.append(task2)
 

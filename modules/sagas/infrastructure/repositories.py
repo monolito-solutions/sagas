@@ -1,5 +1,5 @@
 from uuid import UUID
-from modules.sagas.application.saga import SagasEvent
+from modules.sagas.domain.entities import SagasEvent
 from .dtos import TransactionLogDTO
 
 class TransactionLogRepositorySQLAlchemy:
