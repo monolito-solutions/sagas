@@ -1,5 +1,6 @@
 from uuid import UUID
 from modules.sagas.domain.entities import SagasEvent
+from sqlalchemy.exc import IntegrityError
 from .dtos import TransactionLogDTO
 
 class TransactionLogRepositorySQLAlchemy:
@@ -16,11 +17,19 @@ class TransactionLogRepositorySQLAlchemy:
         return [SagasEvent(**log.to_dict()).to_dict() for log in log_dtos]
 
     def create(self, event: SagasEvent):
-        log_dto = TransactionLogDTO(**event.to_dict())
-        self.db.add(log_dto)
-        self.db.commit()
-        self.db.refresh(log_dto)
-        return log_dto
+        try:
+            log_dto = TransactionLogDTO(**event.to_dict())
+            self.db.add(log_dto)
+            self.db.commit()
+            self.db.refresh(log_dto)
+            return log_dto
+        except IntegrityError:
+            event.event_id = uuid.uuid4()
+            log_dto = TransactionLogDTO(**event.to_dict())
+            self.db.add(log_dto)
+            self.db.commit()
+            self.db.refresh(log_dto)
+            return log_dto
 
     def update(self, event: SagasEvent):
         log_dto = self.db.query(TransactionLogDTO).filter_by(event_id=str(event.order_id)).one()
