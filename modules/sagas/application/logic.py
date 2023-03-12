@@ -1,5 +1,5 @@
 from config.db import get_db
-from infrastructure.repositories import TransactionLogRepositorySQLAlchemy
+from modules.sagas.infrastructure.repositories import TransactionLogRepositorySQLAlchemy
 from infrastructure.dispatchers import Dispatcher
 from modules.sagas.application.messages.payloads import QueryMessage
 import traceback

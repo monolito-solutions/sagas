@@ -13,7 +13,7 @@ class TransactionLogRepositorySQLAlchemy:
 
     def get_order_log(self, order_id: UUID):
         log_dtos = self.db.query(TransactionLogDTO).filter_by(order_id=str(order_id))
-        return [SagasEvent(**log.to_dict()) for log in log_dtos]
+        return [SagasEvent(**log.to_dict()).to_dict() for log in log_dtos]
 
     def create(self, event: SagasEvent):
         log_dto = TransactionLogDTO(**event.to_dict())

@@ -102,13 +102,13 @@ def test_db_sagas():
 @app.get("/get_test")
 def test_get_db(order_id: uuid.UUID):
     test = QueryMessage(
-        order_id = uuid.uuid4(),
+        order_id = str(order_id),
         type = "GetOrderLogs",
         payload = ""
     )
     dispatcher = Dispatcher()
     dispatcher.publish_message(test, "order-queries")
-    return {"events": response}
+    return {"events": "Request sent"}
 
 
 if __name__ == "__main__":

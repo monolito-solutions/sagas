@@ -6,6 +6,7 @@ import aiopulsar
 import asyncio
 from pulsar.schema import *
 from utils import broker_host
+from modules.sagas.application.logic import get_order_logs
 from modules.sagas.application.choreography import ChoreographySagaManager
 
 manager = ChoreographySagaManager()
@@ -24,11 +25,14 @@ async def subscribe_to_topic(topic: str, subscription: str, schema: Record, cons
                     datos = mensaje.value()
                     print(f'\nEvent recibido: {datos.type}')
                     if datos.type == "GetOrderLogs":
-                        get_order_logs(datos.data_payload.order_id)
+                        get_order_logs(datos.order_id)
                     elif datos.type == "EventOrderCreated":
                         manager.start_transaction(datos.data_payload, datos.type, datos.id)
                     else:
-                        manager.handle_event(datos.data_payload, datos.type, datos.id)
+                        try:
+                            manager.handle_event(datos.data_payload, datos.type, datos.id)
+                        except AttributeError:
+                            print(json.loads(datos.payload))
                     await consumer.acknowledge(mensaje)
 
     except:
