@@ -1,6 +1,6 @@
-# Inbound - Monolito Solutions
+# Sagas - Monolito Solutions
 
-Este es el repositorio del microservicio Inbound del proyecto "Entregas de los Alpes", el cual se encarga de recibir los pedidos del cliente. Este microservicio fue construido utilizando el framework FastAPI.
+Este es el repositorio del microservicio de Sagas del proyecto "Entregas de los Alpes", el cual se encarga de procesar transacciones largas de creación de órdenes.
 
 ## Requerimientos
 
@@ -28,5 +28,3 @@ Para correr el microservicio Inbound, use el siguiente comando:
 ```
 python main.py
 ```
-
-Una vez que el microservicio esté corriendo, se podrá hacer una petición HTTP POST al endpoint `/orders` para enviar un pedido al microservicio. El pedido debe incluir un formato similar a los encontrados en la carpeta de ```./json_examples```.
