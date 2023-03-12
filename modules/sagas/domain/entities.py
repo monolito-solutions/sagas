@@ -1,13 +1,13 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
+
 @dataclass
 class SagasEvent:
     event_id: str
     event_type: str
     order_id: str
     order_status: str
-    timestamp: int = field(default_factory= lambda: int(datetime.now().timestamp()))
-
+    timestamp: float = None
     def to_dict(self):
         return {
             "event_id": self.event_id,
@@ -16,3 +16,7 @@ class SagasEvent:
             "order_status": self.order_status,
             "timestamp": self.timestamp
         }
+
+    def __post_init__(self):
+        if self.timestamp is None:
+            self.timestamp = datetime.now().isoformat()
