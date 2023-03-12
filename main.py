@@ -101,10 +101,13 @@ def test_db_sagas():
 
 @app.get("/get_test")
 def test_get_db(order_id: uuid.UUID):
-    db = get_db()
-    repository = TransactionLogRepositorySQLAlchemy(db)
-    response = repository.get_order_log(order_id)
-    db.close()
+    test = QueryMessage(
+        order_id = uuid.uuid4(),
+        type = "GetOrderLogs",
+        payload = ""
+    )
+    dispatcher = Dispatcher()
+    dispatcher.publish_message(test, "order-queries")
     return {"events": response}
 
 
