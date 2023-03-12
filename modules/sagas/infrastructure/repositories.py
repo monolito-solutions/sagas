@@ -1,4 +1,4 @@
-from uuid import UUID
+from uuid import UUID, uuid4
 from modules.sagas.domain.entities import SagasEvent
 from sqlalchemy.exc import IntegrityError
 from .dtos import TransactionLogDTO
@@ -24,7 +24,7 @@ class TransactionLogRepositorySQLAlchemy:
             self.db.refresh(log_dto)
             return log_dto
         except IntegrityError:
-            event.event_id = uuid.uuid4()
+            event.event_id = uuid4()
             log_dto = TransactionLogDTO(**event.to_dict())
             self.db.add(log_dto)
             self.db.commit()
