@@ -24,6 +24,7 @@ class TransactionLogRepositorySQLAlchemy:
             self.db.refresh(log_dto)
             return log_dto
         except IntegrityError:
+            self.db.rollback()
             event.event_id = uuid4()
             log_dto = TransactionLogDTO(**event.to_dict())
             self.db.add(log_dto)
