@@ -1,4 +1,4 @@
-from sqlalchemy import String, Column
+from sqlalchemy import String, Column, Integer
 from config.db import Base
 
 class TransactionLogDTO(Base):
@@ -8,11 +8,13 @@ class TransactionLogDTO(Base):
     event_type = Column(String(36))
     order_id = Column(String(36), index=True)
     order_status = Column(String(50))
+    timestamp = Column(Integer())
 
     def to_dict(self):
         return {
             "event_id" : self.event_id,
             "event_type" : self.event_type,
             "order_id" : self.order_id,
-            "order_status" : self.order_status
+            "order_status" : self.order_status,
+            "timestamp": self.timestamp
         }
