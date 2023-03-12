@@ -103,7 +103,7 @@ def test_db_sagas():
 def test_get_db(order_id: uuid.UUID):
     test = QueryMessage(
         order_id = str(order_id),
-        type = "GetOrderLogs",
+        type = "CommandGetOrder",
         payload = ""
     )
     dispatcher = Dispatcher()
