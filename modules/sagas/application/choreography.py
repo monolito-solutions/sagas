@@ -1,7 +1,7 @@
 import json
 import time
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Union
 import uuid
 from infrastructure.dispatchers import Dispatcher
 from modules.orders.application.commands.commands import CommandPayload, OrderCommand
@@ -17,7 +17,7 @@ class Step:
     index: int = 0
     event: str = ""
     error: str = ""
-    compensation: str | None = None
+    compensation: Union[str, None] = None
     step_completed: bool = False
     last_event: bool = False
 
